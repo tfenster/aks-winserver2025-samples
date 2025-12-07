@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bc
+  labels:
+    app: bc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: bc
+      labels:
+        app: bc
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": windows
+      containers:
+      - name: bc
+        image: tobiasfenster/mybc:sandbox-28.0.43121.0-w1-mt
+        ports:
+        - containerPort: 443
+        env:
+        - name: username
+          value: tfenster
+        - name: password
+          value: Super5ecret!
+        - name: auth
+          value: NavUserPassword
+        - name: accept_eula
+          value: "y"
+        - name: accept_outdated
+          value: "y"
+  selector:
+    matchLabels:
+      app: bc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bc
+spec:
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 443
+    name: https
+  selector:
+    app: bc
